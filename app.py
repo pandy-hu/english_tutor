@@ -47,7 +47,18 @@ def play_btn(text, label="🔊 听发音", key=None):
 if st.session_state.tool == "flash":
     st.header("📇 智能单词卡（间隔重复记忆）")
     st.caption("按记忆曲线复习：答对的词下次出现间隔变长，答错立刻重来。掌握度≥60 的词会进入「已知词」，阅读时不再高亮。")
-    due = core.due_words()
+    # 学段筛选（按教材选词）
+    levels = ["全部"] + core.get_levels()
+    if "flash_level" not in st.session_state:
+        st.session_state.flash_level = "全部"
+    sel_level = st.selectbox("🎯 选择学段（按教材选词）", levels,
+                             index=levels.index(st.session_state.flash_level), key="flash_level_sel")
+    st.session_state.flash_level = sel_level
+    # 词库统计
+    total = len(core.load_words())
+    cnt_by_lv = {lv: len(core.load_words(lv)) for lv in core.get_levels()}
+    st.caption("📚 词库总量：" + str(total) + " 词　" + "　".join(f"{k} {v}" for k, v in cnt_by_lv.items()))
+    due = core.due_words(level=sel_level if sel_level != "全部" else None)
     if not due:
         st.success("🎉 今天的复习任务清空啦！去『阅读/跟读』里多接触新词吧。")
     else:

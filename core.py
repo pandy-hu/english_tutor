@@ -16,8 +16,12 @@ DATA = BASE / "data"
 AUDIO = DATA / "audio"
 AUDIO.mkdir(parents=True, exist_ok=True)
 WORDS_FILE = DATA / "words.json"
-PROGRESS_FILE = DATA / "progress.json"
-MISTAKES_FILE = DATA / "mistakes.json"
+# 用户数据独立目录：本地默认存项目内 user_data/（持久化）；
+# 云端部署时可设环境变量 ENGTUTOR_DATA_DIR 指向挂载卷，实现重启不丢数据。
+USER_DIR = Path(os.environ.get("ENGTUTOR_DATA_DIR", BASE / "user_data"))
+USER_DIR.mkdir(parents=True, exist_ok=True)
+PROGRESS_FILE = USER_DIR / "progress.json"
+MISTAKES_FILE = USER_DIR / "mistakes.json"
 CONFIG_FILE = BASE / ".streamlit" / "secrets.toml"
 
 # ---------- 防御式导入 ----------
@@ -153,9 +157,9 @@ def schedule_next(box, quality):
     return box, datetime.now() + intervals[box]
 
 
-def due_words():
-    """返回今天及之前该复习的词列表（含内置词 + 用户进度）。"""
-    words = load_words()
+def due_words(level=None):
+    """返回今天及之前该复习的词列表（含内置词 + 用户进度）。level 可选：小学/初中/高中/全部。"""
+    words = load_words(level=level)
     prog = load_progress()
     out = []
     now = datetime.now()
@@ -191,17 +195,31 @@ def review_word(word, correct):
 # ============================================================
 # 4. 词库
 # ============================================================
-def load_words():
+def load_words(level=None):
     if WORDS_FILE.exists():
         try:
-            return json.loads(WORDS_FILE.read_text(encoding="utf-8")).get("words", [])
+            ws = json.loads(WORDS_FILE.read_text(encoding="utf-8")).get("words", [])
+            if level and level != "全部":
+                ws = [w for w in ws if w.get("level", "初中") == level]
+            return ws
         except Exception:
             return []
     return []
 
 
+def get_levels():
+    """返回词库中所有学段（去重、稳定排序）。"""
+    levels = set()
+    for w in load_words():
+        levels.add(w.get("level", "初中"))
+    order = {"小学": 0, "初中": 1, "高中": 2, "自定义": 3}
+    return sorted(levels, key=lambda x: order.get(x, 9))
+
+
 def add_word(w):
     data = {"meta": {"name": "user"}, "words": load_words()}
+    w = dict(w)
+    w.setdefault("level", "自定义")
     if any(x["word"].lower() == w["word"].lower() for x in data["words"]):
         return False
     data["words"].append(w)
