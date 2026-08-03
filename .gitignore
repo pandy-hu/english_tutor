@@ -1,0 +1,7 @@
+# 运行时生成的缓存与用户数据（不进版本库）
+data/audio/
+data/progress.json
+data/mistakes.json
+__pycache__/
+*.pyc
+.DS_Store
