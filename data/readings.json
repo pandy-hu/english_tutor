@@ -1,0 +1,112 @@
+{
+  "readings": [
+    {
+      "level": "小学",
+      "title": "My Cat",
+      "text": "I have a small white cat. Her name is Mimi. She likes to sleep on the sofa. Every morning, she waits by the door. When I come home, she runs to me. I feed her fish and milk. Mimi is my best friend.",
+      "questions": [
+        {"q": "What color is the cat?", "options": ["Black", "White", "Brown"], "answer": 1, "explain": "原文说 a small white cat。"},
+        {"q": "What does Mimi like to eat?", "options": ["Fish and milk", "Bread", "Rice"], "answer": 0, "explain": "原文说 I feed her fish and milk。"}
+      ]
+    },
+    {
+      "level": "小学",
+      "title": "A Rainy Day",
+      "text": "It is raining outside. I cannot go to the park. My mother and I stay at home. We read a book and drink hot tea. The rain makes a nice sound. I like rainy days because I can stay with my family.",
+      "questions": [
+        {"q": "Why can't the child go to the park?", "options": ["It is too hot", "It is raining", "He is sick"], "answer": 1, "explain": "原文第一句 It is raining outside."},
+        {"q": "What do they do at home?", "options": ["Watch TV", "Read a book and drink tea", "Play games"], "answer": 1, "explain": "原文 We read a book and drink hot tea."}
+      ]
+    },
+    {
+      "level": "小学",
+      "title": "My Best Friend",
+      "text": "Tom is my best friend. We are in the same class. He is good at drawing. I am good at running. After school, we play together. We help each other with homework. A good friend makes school fun.",
+      "questions": [
+        {"q": "What is Tom good at?", "options": ["Running", "Drawing", "Singing"], "answer": 1, "explain": "原文 He is good at drawing."},
+        {"q": "Where do they help each other?", "options": ["In the park", "With homework", "On the bus"], "answer": 1, "explain": "原文 We help each other with homework."}
+      ]
+    },
+    {
+      "level": "小学",
+      "title": "Going to the Park",
+      "text": "Sunday is my favorite day. My dad takes me to the park. We ride bikes and fly a kite. We see ducks in the lake. Then we eat ice cream. I always feel happy in the park.",
+      "questions": [
+        {"q": "Who takes the child to the park?", "options": ["His mom", "His dad", "His teacher"], "answer": 1, "explain": "原文 My dad takes me to the park."},
+        {"q": "What do they see in the lake?", "options": ["Fish", "Ducks", "Boats"], "answer": 1, "explain": "原文 We see ducks in the lake."}
+      ]
+    },
+    {
+      "level": "初中",
+      "title": "The Lost Dog",
+      "text": "Last Sunday, Lucy found a small dog near the supermarket. The dog had no collar. Lucy took it home and put up notices in the neighborhood. Two days later, a boy called. It was his dog, Coco. He was very happy to get Coco back. Lucy learned that helping others brings joy.",
+      "questions": [
+        {"q": "Where did Lucy find the dog?", "options": ["In the park", "Near the supermarket", "At school"], "answer": 1, "explain": "原文 found a small dog near the supermarket。"},
+        {"q": "How did the owner find his dog?", "options": ["By a notice", "On the street", "From a friend"], "answer": 0, "explain": "Lucy put up notices, the boy saw one and called."}
+      ]
+    },
+    {
+      "level": "初中",
+      "title": "A School Trip",
+      "text": "Our class went to the science museum last week. We saw robots, old computers and a model of the earth. The guide told us many interesting facts. I took a lot of photos. The trip taught me that science is everywhere in our life. I want to be a scientist one day.",
+      "questions": [
+        {"q": "What did they see at the museum?", "options": ["Paintings", "Robots and a model of the earth", "Cars"], "answer": 1, "explain": "原文 saw robots, old computers and a model of the earth。"},
+        {"q": "What does the writer want to be?", "options": ["A teacher", "A scientist", "A guide"], "answer": 1, "explain": "原文 I want to be a scientist one day."}
+      ]
+    },
+    {
+      "level": "初中",
+      "title": "Helping Mom",
+      "text": "My mom is busy every day. Yesterday I decided to help her. I washed the dishes and cleaned my room. Then I cooked noodles for dinner. Mom was surprised and said they were delicious. Doing housework makes me understand how hard moms work.",
+      "questions": [
+        {"q": "What did the writer cook?", "options": ["Rice", "Noodles", "Soup"], "answer": 1, "explain": "原文 I cooked noodles for dinner."},
+        {"q": "What did the writer learn?", "options": ["Cooking is easy", "Moms work hard", "Noodles are delicious"], "answer": 1, "explain": "原文 Doing housework makes me understand how hard moms work."}
+      ]
+    },
+    {
+      "level": "初中",
+      "title": "My Dream Job",
+      "text": "When people ask me what I want to be, I say a doctor. Doctors help sick people get better. It is a hard job, but it is meaningful. To make my dream come true, I must study hard, especially biology and English. I believe I can do it if I never give up.",
+      "questions": [
+        {"q": "Why does the writer want to be a doctor?", "options": ["It pays well", "Doctors help sick people", "It is easy"], "answer": 1, "explain": "原文 Doctors help sick people get better."},
+        {"q": "Which subjects does he mention?", "options": ["Math and art", "Biology and English", "History and music"], "answer": 1, "explain": "原文 especially biology and English."}
+      ]
+    },
+    {
+      "level": "高中",
+      "title": "The Power of Reading",
+      "text": "Reading is one of the most effective ways to broaden your mind. Through books, we can travel to places we have never been and meet people we would never know. Reading also improves our writing and thinking. However, the key is to read widely and think critically, rather than accept everything we read. A good reader questions and reflects.",
+      "questions": [
+        {"q": "According to the passage, what can reading improve?", "options": ["Only vocabulary", "Writing and thinking", "Physical health"], "answer": 1, "explain": "原文 Reading also improves our writing and thinking."},
+        {"q": "What does the writer suggest good readers do?", "options": ["Accept everything", "Question and reflect", "Read only one topic"], "answer": 1, "explain": "原文 A good reader questions and reflects."}
+      ]
+    },
+    {
+      "level": "高中",
+      "title": "Should Students Use Phones?",
+      "text": "Smartphones are useful tools, but they can also distract students. Some schools ban phones completely, while others allow them only in class for learning. In my view, the problem is not the phone itself, but self-control. If students use phones wisely, they can learn a lot; if not, grades may drop. Balance is the answer.",
+      "questions": [
+        {"q": "What is the writer's opinion on phones?", "options": ["They should be banned everywhere", "The problem is self-control, not the phone", "They are useless for study"], "answer": 1, "explain": "原文 the problem is not the phone itself, but self-control."},
+        {"q": "What does the writer think is the answer?", "options": ["Balance", "More bans", "No phones at all"], "answer": 0, "explain": "原文 Balance is the answer."}
+      ]
+    },
+    {
+      "level": "高中",
+      "title": "A Lesson from Failure",
+      "text": "I once failed an important exam and felt like giving up. My teacher told me that failure is not the end, but a lesson. I reviewed my mistakes and changed my study plan. Months later, I improved a lot. Now I see failure as a chance to grow. Success often hides behind the lessons we learn from losing.",
+      "questions": [
+        {"q": "What did the teacher say about failure?", "options": ["It is the end", "It is a lesson", "It is shameful"], "answer": 1, "explain": "原文 failure is not the end, but a lesson."},
+        {"q": "What does the writer compare success to?", "options": ["A gift", "Something hiding behind lessons from failure", "Luck"], "answer": 1, "explain": "原文 Success often hides behind the lessons we learn from losing."}
+      ]
+    },
+    {
+      "level": "高中",
+      "title": "Volunteering Changed Me",
+      "text": "Last summer I volunteered at a village school. The children there had few books but big dreams. Teaching them English was tiring, yet their smiles kept me going. I realized how lucky I am and how much I take for granted. Volunteering did not just help them; it changed me into a more thankful person.",
+      "questions": [
+        {"q": "What did the children lack?", "options": ["Dreams", "Books", "Teachers"], "answer": 1, "explain": "原文 had few books but big dreams."},
+        {"q": "How did volunteering change the writer?", "options": ["Made him richer", "Made him more thankful", "Made him tired only"], "answer": 1, "explain": "原文 changed me into a more thankful person."}
+      ]
+    }
+  ]
+}

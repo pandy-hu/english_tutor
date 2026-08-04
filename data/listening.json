@@ -1,0 +1,94 @@
+{
+  "listening": [
+    {
+      "level": "小学",
+      "type": "dialogue",
+      "title": "At the Shop",
+      "script": "Shopkeeper: Can I help you?\nLisa: Yes, I want an apple and a banana, please.\nShopkeeper: Here you are. That is two yuan.\nLisa: Thank you. Goodbye!\nShopkeeper: Bye!",
+      "questions": [
+        {"q": "What does Lisa want to buy?", "options": ["An apple and a banana", "A book", "A pen"], "answer": 0, "explain": "Lisa 说 I want an apple and a banana."},
+        {"q": "How much does it cost?", "options": ["One yuan", "Two yuan", "Three yuan"], "answer": 1, "explain": "Shopkeeper 说 That is two yuan."}
+      ]
+    },
+    {
+      "level": "小学",
+      "type": "story",
+      "title": "Tom's Birthday",
+      "script": "Today is Tom's birthday. His mom makes a big cake. His friends come to the party. They sing a song and eat the cake. Tom gets a red toy car. He is very happy. He says, 'This is the best day!'",
+      "questions": [
+        {"q": "What does Tom's mom make?", "options": ["A cake", "A pizza", "A salad"], "answer": 0, "explain": "原文 His mom makes a big cake."},
+        {"q": "What gift does Tom get?", "options": ["A blue ball", "A red toy car", "A book"], "answer": 1, "explain": "原文 Tom gets a red toy car."}
+      ]
+    },
+    {
+      "level": "小学",
+      "type": "dialogue",
+      "title": "After School",
+      "script": "Mom: How was school today?\nBen: It was fun! We played football.\nMom: Did you finish your homework?\nBen: Not yet. I will do it now.\nMom: Good boy.",
+      "questions": [
+        {"q": "What did Ben do at school?", "options": ["Played football", "Watched a movie", "Read a book"], "answer": 0, "explain": "Ben 说 We played football."},
+        {"q": "Will Ben do his homework?", "options": ["No", "Yes, now", "Tomorrow"], "answer": 1, "explain": "Ben 说 I will do it now."}
+      ]
+    },
+    {
+      "level": "初中",
+      "type": "dialogue",
+      "title": "Asking the Way",
+      "script": "Tourist: Excuse me, how can I get to the train station?\nLocal: Go straight and turn left at the bank. Then walk for five minutes. You will see it on your right.\nTourist: Thank you very much!\nLocal: You're welcome.",
+      "questions": [
+        {"q": "Where does the tourist want to go?", "options": ["The bank", "The train station", "The school"], "answer": 1, "explain": "Tourist 问 how can I get to the train station."},
+        {"q": "Which way should he turn?", "options": ["Turn right at the bank", "Turn left at the bank", "Go back"], "answer": 1, "explain": "Local 说 turn left at the bank."}
+      ]
+    },
+    {
+      "level": "初中",
+      "type": "story",
+      "title": "The Honest Boy",
+      "script": "Jack broke his neighbor's window with a ball. He was afraid, but he went to the neighbor and said sorry. The neighbor was not angry. He said, 'I like honest boys.' Jack helped fix the window. He felt proud of telling the truth.",
+      "questions": [
+        {"q": "What did Jack break?", "options": ["A door", "A window", "A bottle"], "answer": 1, "explain": "原文 broke his neighbor's window."},
+        {"q": "How did the neighbor feel?", "options": ["Angry", "Not angry, he liked honesty", "Sad"], "answer": 1, "explain": "邻居说 I like honest boys."}
+      ]
+    },
+    {
+      "level": "初中",
+      "type": "dialogue",
+      "title": "Making Plans",
+      "script": "Anna: What are you doing this weekend?\nLeo: I plan to visit the museum on Saturday.\nAnna: Sounds great! Can I join you?\nLeo: Sure! Let's meet at nine at the bus stop.\nAnna: Perfect, see you then.",
+      "questions": [
+        {"q": "What will Leo do on Saturday?", "options": ["Visit the museum", "Go swimming", "Stay home"], "answer": 0, "explain": "Leo 说 I plan to visit the museum on Saturday."},
+        {"q": "Where will they meet?", "options": ["At the school", "At the bus stop", "At Anna's home"], "answer": 1, "explain": "Leo 说 Let's meet at nine at the bus stop."}
+      ]
+    },
+    {
+      "level": "高中",
+      "type": "dialogue",
+      "title": "A Job Interview",
+      "script": "Manager: Why do you want this job?\nApplicant: I have always been interested in teaching. I volunteered at a school last summer and loved it.\nManager: What is your strength?\nApplicant: I am patient and good at explaining difficult ideas.\nManager: Good. We will call you next week.",
+      "questions": [
+        {"q": "What job is the applicant applying for?", "options": ["A teacher", "A manager", "A doctor"], "answer": 0, "explain": "Applicant 提到 interested in teaching 和 volunteered at a school。"},
+        {"q": "What strength does the applicant mention?", "options": ["Being fast", "Being patient and good at explaining", "Speaking many languages"], "answer": 1, "explain": "原文 I am patient and good at explaining difficult ideas."}
+      ]
+    },
+    {
+      "level": "高中",
+      "type": "story",
+      "title": "The Unexpected Gift",
+      "script": "Emma saved money for months to buy a bike. On her birthday, her parents gave her the exact bike she wanted. She was surprised and cried happily. Later she learned her parents had secretly added money to her savings. Small acts of love often mean the most.",
+      "questions": [
+        {"q": "What did Emma want to buy?", "options": ["A phone", "A bike", "A computer"], "answer": 1, "explain": "原文 saved money for months to buy a bike."},
+        {"q": "What is the main idea of the story?", "options": ["Saving money is hard", "Small acts of love mean the most", "Bikes are expensive"], "answer": 1, "explain": "结尾点题 Small acts of love often mean the most."}
+      ]
+    },
+    {
+      "level": "高中",
+      "type": "dialogue",
+      "title": "Debating Homework",
+      "script": "Student: I think homework should be less. We are too tired.\nTeacher: Homework helps you remember what you learn. But it should not be too much.\nStudent: Then maybe short and useful homework is best?\nTeacher: I agree. Quality matters more than quantity.\nStudent: That makes sense.",
+      "questions": [
+        {"q": "What does the teacher think about homework?", "options": ["It is useless", "It helps but should not be too much", "It should be removed"], "answer": 1, "explain": "Teacher 说 Homework helps you remember... but should not be too much."},
+        {"q": "What do they agree on at last?", "options": ["No homework", "Quality matters more than quantity", "More homework"], "answer": 1, "explain": "结尾 Teacher 说 Quality matters more than quantity."}
+      ]
+    }
+  ]
+}

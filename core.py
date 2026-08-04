@@ -227,6 +227,34 @@ def add_word(w):
     return True
 
 
+def load_readings(level=None):
+    """返回分级阅读文章（可选按学段过滤）。每条含 title/text/questions。"""
+    f = DATA / "readings.json"
+    if not f.exists():
+        return []
+    try:
+        rs = json.loads(f.read_text(encoding="utf-8")).get("readings", [])
+        if level and level != "全部":
+            rs = [r for r in rs if r.get("level") == level]
+        return rs
+    except Exception:
+        return []
+
+
+def load_listening(level=None):
+    """返回听力题库（可选按学段过滤）。每条含 type/title/script/questions。"""
+    f = DATA / "listening.json"
+    if not f.exists():
+        return []
+    try:
+        ls = json.loads(f.read_text(encoding="utf-8")).get("listening", [])
+        if level and level != "全部":
+            ls = [l for l in ls if l.get("level") == level]
+        return ls
+    except Exception:
+        return []
+
+
 def lookup(word):
     wl = word.lower().strip()
     for w in load_words():
@@ -297,6 +325,38 @@ def get_mistakes():
         except Exception:
             return []
     return []
+
+
+def get_mistake_words():
+    """返回错题本里出现过的『单词』（小写集合），用于错题强化。
+
+    覆盖：默写（correct_answer 即单词）、单词卡（question 形如『背诵 apple』）。
+    """
+    out = set()
+    for m in get_mistakes():
+        mod = m.get("module", "")
+        if mod == "默写":
+            w = (m.get("correct_answer") or "").strip().lower()
+            if w:
+                out.add(w)
+        elif mod == "单词卡":
+            q = m.get("question", "")
+            if q.startswith("背诵 "):
+                w = q[3:].strip().lower()
+                if w:
+                    out.add(w)
+    return out
+
+
+def get_mistake_sentences(module):
+    """返回某模块（跟读/听力）记录过错的句子列表（去重，保留顺序）。"""
+    out = []
+    for m in get_mistakes():
+        if m.get("module") == module and (m.get("question") or "").strip():
+            s = m["question"].strip()
+            if s not in out:
+                out.append(s)
+    return out
 
 
 def weekly_report():
@@ -401,3 +461,29 @@ def ai_speak_partner(level, user_text, history):
         return resp.choices[0].message.content
     except Exception as e:
         return f"[AI 调用失败] {e}"
+
+
+def ai_transcribe_image(image_bytes):
+    """用视觉模型识别图片中的手写/印刷英文，返回文本；未配置或失败返回 None/错误串。"""
+    cfg = get_ai_config()
+    if not _OPENAI_AVAILABLE or not cfg.get("api_key"):
+        return None
+    import base64
+    b64 = base64.b64encode(image_bytes).decode("ascii")
+    try:
+        client = OpenAI(api_key=cfg["api_key"], base_url=cfg["base_url"] or None)
+        resp = client.chat.completions.create(
+            model=cfg["model"],
+            messages=[{
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "请识别这张图片里的英文手写/印刷内容，只输出识别出的英文文本，不要加解释。"},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{b64}"}},
+                ],
+            }],
+            temperature=0.2,
+        )
+        return resp.choices[0].message.content
+    except Exception as e:
+        return f"[识别失败] {e}"
+
