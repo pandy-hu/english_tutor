@@ -9,6 +9,7 @@ import re
 import hashlib
 import difflib
 from datetime import datetime, timedelta
+import time
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parent
@@ -52,6 +53,152 @@ except Exception:
 DEFAULT_VOICE = "en-US-AriaNeural"
 
 _whisper_model = None
+
+
+# ============================================================
+# 0. CloudBase 云端持久化（双写容错，省费用）
+# ============================================================
+# 设计：仅在「复习一次 / 记一次错」时各写 1 次云端，调用极少，免费额度内。
+# 本地文件为会话兜底，云端为跨重启权威；云端不可达时自动回退本地，数据不丢。
+CB_ENV = os.environ.get("CLOUDBASE_ENV", "shangye-tengxunyun-d6cezf7ba95e3")
+CB_BASE = f"https://{CB_ENV}.api.tcloudbasegateway.com/v1/database/instances/(default)/databases/(default)"
+CB_COLL_PROGRESS = "english_progress"
+CB_COLL_MISTAKES = "english_mistakes"
+CB_DOC_ID = "global"
+CB_TTL = 600  # 进程内缓存秒数：避免频繁打云端，也防止云端短暂失败回退丢数据
+
+_CB_CACHE = {}
+_CB_CACHE_T = {}
+
+
+def _cb_key():
+    k = os.environ.get("CLOUDBASE_API_KEY", "")
+    if k:
+        return k
+    # 回退：从 .streamlit/secrets.toml 顶层读取
+    if CONFIG_FILE.exists():
+        try:
+            for line in CONFIG_FILE.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if "=" in line and not line.startswith("#"):
+                    kk, vv = line.split("=", 1)
+                    if kk.strip() == "CLOUDBASE_API_KEY":
+                        return vv.strip().strip('"').strip("'")
+        except Exception:
+            pass
+    return ""
+
+
+def _cb_enabled():
+    return _REQ_AVAILABLE and bool(_cb_key())
+
+
+def _ejson_unwrap(v):
+    """把 CloudBase 返回的 Strict EJSON（数字包成 $numberInt 等）还原成原生类型。"""
+    if isinstance(v, dict):
+        if "$numberInt" in v:
+            return int(v["$numberInt"])
+        if "$numberLong" in v:
+            return int(v["$numberLong"])
+        if "$numberDouble" in v:
+            return float(v["$numberDouble"])
+        if "$date" in v:
+            return v["$date"]
+        if "$oid" in v:
+            return v["$oid"]
+        return {k: _ejson_unwrap(x) for k, x in v.items()}
+    if isinstance(v, list):
+        return [_ejson_unwrap(x) for x in v]
+    return v
+
+
+def _cb_request(method, url, body=None, params=None):
+    if not _cb_enabled():
+        return None
+    headers = {"Authorization": f"Bearer {_cb_key()}", "Content-Type": "application/json"}
+    try:
+        if method == "GET":
+            r = requests.get(url, headers=headers, params=params, timeout=12)
+        else:
+            r = requests.request(method, url, headers=headers, json=body, timeout=12)
+        return r
+    except Exception:
+        return None
+
+
+def _cb_doc_get(coll):
+    """返回该集合 _id=global 文档的对象（已 unwrap），不存在返回 None。"""
+    url = f"{CB_BASE}/collections/{coll}/documents"
+    params = {"query": json.dumps({"_id": CB_DOC_ID}, separators=(",", ":"))}
+    r = _cb_request("GET", url, params=params)
+    if r is not None:
+        try:
+            j = r.json()
+        except Exception:
+            j = None
+        if isinstance(j, dict) and isinstance(j.get("list"), list) and j["list"]:
+            return _ejson_unwrap(j["list"][0])
+    return None
+
+
+def _cb_doc_exists(coll):
+    url = f"{CB_BASE}/collections/{coll}/documents"
+    params = {"query": json.dumps({"_id": CB_DOC_ID}, separators=(",", ":"))}
+    r = _cb_request("GET", url, params=params)
+    if r is not None:
+        try:
+            j = r.json()
+        except Exception:
+            j = None
+        if isinstance(j, dict) and isinstance(j.get("list"), list):
+            return len(j["list"]) > 0
+    return False
+
+
+def _cb_doc_put(coll, payload):
+    """upsert：存在则 PATCH 更新（replaceMode=false → data 自动包成 $set，覆盖整字段），
+    不存在则 POST 插入（带 _id=global）。返回是否成功。
+
+    关键坑：PATCH 的 body 里 query 必须是「JSON 对象」，不是字符串（GET 的 query 才是 URL 字符串）；
+    data 用 $set 覆盖字段，避免 merge 丢字段。
+    """
+    if _cb_doc_exists(coll):
+        body = {
+            "query": {"_id": CB_DOC_ID},   # 必须是对象，不是 json.dumps 字符串
+            "data": {"$set": payload},      # replaceMode=false 时把整字段替换成新值
+            "multi": False,
+            "upsert": False,
+            "replaceMode": False,
+        }
+        r = _cb_request("PATCH", f"{CB_BASE}/collections/{coll}/documents", body)
+    else:
+        body = {"data": [{**payload, "_id": CB_DOC_ID}]}
+        r = _cb_request("POST", f"{CB_BASE}/collections/{coll}/documents", body)
+    if r is None:
+        return False
+    # 网关对失败也返回 HTTP 200，业务错误写在 body.Response.Error 里
+    try:
+        j = r.json()
+        if isinstance(j, dict) and isinstance(j.get("Response"), dict) and j["Response"].get("Error"):
+            return False
+    except Exception:
+        pass
+    return r.status_code in (200, 201)
+
+
+def _cb_get_cached(coll):
+    now = time.time()
+    if coll in _CB_CACHE and now - _CB_CACHE_T.get(coll, 0) < CB_TTL:
+        return _CB_CACHE[coll]
+    val = _cb_doc_get(coll)
+    _CB_CACHE[coll] = val
+    _CB_CACHE_T[coll] = now
+    return val
+
+
+def _cb_set_cache(coll, payload):
+    _CB_CACHE[coll] = payload
+    _CB_CACHE_T[coll] = time.time()
 
 
 # ============================================================
@@ -135,6 +282,9 @@ def compare_text(target, user_text):
 # 3. 间隔重复（单词记忆）
 # ============================================================
 def load_progress():
+    cloud = _cb_get_cached(CB_COLL_PROGRESS)
+    if isinstance(cloud, dict) and cloud.get("progress"):
+        return cloud["progress"]
     if PROGRESS_FILE.exists():
         try:
             return json.loads(PROGRESS_FILE.read_text(encoding="utf-8"))
@@ -145,6 +295,8 @@ def load_progress():
 
 def save_progress(data):
     PROGRESS_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    _cb_doc_put(CB_COLL_PROGRESS, {"progress": data})  # 云端双写（失败静默）
+    _cb_set_cache(CB_COLL_PROGRESS, {"progress": data})  # 进程内缓存保持最新，防止云端短暂故障回退丢数据
 
 
 def schedule_next(box, quality):
@@ -316,9 +468,15 @@ def add_mistake(module, question, user_answer, correct_answer):
         "correct_answer": correct_answer,
     })
     MISTAKES_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    _cb_doc_put(CB_COLL_MISTAKES, {"items": data})  # 云端双写（失败静默）
+    _cb_set_cache(CB_COLL_MISTAKES, {"items": data})  # 进程内缓存保持最新
 
 
 def get_mistakes():
+    # 云端优先（跨重启权威），本地兜底
+    cloud = _cb_get_cached(CB_COLL_MISTAKES)
+    if isinstance(cloud, dict) and isinstance(cloud.get("items"), list) and cloud["items"]:
+        return cloud["items"]
     if MISTAKES_FILE.exists():
         try:
             return json.loads(MISTAKES_FILE.read_text(encoding="utf-8"))
@@ -400,7 +558,11 @@ QUIZ = [
 # 7. AI 批改 / 口语陪练（OpenAI 兼容，需用户配置 key）
 # ============================================================
 def get_ai_config():
-    cfg = {"api_key": "", "base_url": "", "model": "deepseek-chat"}
+    # 文本(批改/口语)与视觉(手写识别)可分别用不同服务商：
+    # 文本用 DeepSeek 最划算；视觉用 DashScope qwen-vl-ocr 最划算。
+    # 视觉密钥缺省时回落到文本密钥（同服务商场景）。
+    cfg = {"api_key": "", "base_url": "", "model": "deepseek-v4-flash",
+           "vision_model": "", "vision_api_key": "", "vision_base_url": ""}
     if CONFIG_FILE.exists():
         try:
             txt = CONFIG_FILE.read_text(encoding="utf-8")
@@ -466,14 +628,17 @@ def ai_speak_partner(level, user_text, history):
 def ai_transcribe_image(image_bytes):
     """用视觉模型识别图片中的手写/印刷英文，返回文本；未配置或失败返回 None/错误串。"""
     cfg = get_ai_config()
-    if not _OPENAI_AVAILABLE or not cfg.get("api_key"):
+    if not _OPENAI_AVAILABLE or not (cfg.get("api_key") or cfg.get("vision_api_key")):
         return None
     import base64
     b64 = base64.b64encode(image_bytes).decode("ascii")
+    vision_model = cfg.get("vision_model") or cfg.get("model")
+    v_key = cfg.get("vision_api_key") or cfg.get("api_key")
+    v_url = cfg.get("vision_base_url") or cfg.get("base_url") or None
     try:
-        client = OpenAI(api_key=cfg["api_key"], base_url=cfg["base_url"] or None)
+        client = OpenAI(api_key=v_key, base_url=v_url)
         resp = client.chat.completions.create(
-            model=cfg["model"],
+            model=vision_model,
             messages=[{
                 "role": "user",
                 "content": [
