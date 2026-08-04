@@ -42,9 +42,11 @@ model = "deepseek-chat"
 2. 打开 https://share.streamlit.io → New app → 选该仓库的 `app.py`
 3. 点 Deploy，几分钟后得到公网地址
 
+> 🌐 **已上线公网地址**：https://englishtutor-klzpnvtvolcyumvp7n246f.streamlit.app/
+
 数据全部存在本地 `user_data/` 目录下（学习进度、错题本），**不上传任何服务器**，隐私安全；`user_data/` 已在 `.gitignore` 忽略，不会进版本库。词库 `data/words.json` 含 **652 个 K12 核心词**，按小学/初中/高中标注，可在「单词卡」里按学段筛选，或在页面内手动添加。
 
-> 云端部署持久化：设置环境变量 `ENGTUTOR_DATA_DIR` 指向挂载卷（如 Streamlit Cloud 的 volume 挂载路径），用户数据即可跨重启保留。
+> ⚠️ **云端持久化说明**：Streamlit Cloud 免费版**没有挂载目录/持久卷**，学习进度与错题本在实例重启/重新部署后会清空。要真正云端不丢，需接 CloudBase 数据库或腾讯云 CloudRun（详见 `部署到Streamlit Cloud.md` 第七节）。
 
 ## 技术栈
 
